@@ -27,7 +27,7 @@ const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
   console.log(input_values)
 
   return (
-     <View className='bg-secondary justify-center gap-8 items-center max-w-[320px] w-3xl rounded-lg p-8'>
+     <View className='bg-secondary justify-center gap-8 items-center max-w-[320px] rounded-lg p-8'>
         <View className='w-full gap-2'>
           <Text className='text-white'>Email Address</Text>
           <TextInput

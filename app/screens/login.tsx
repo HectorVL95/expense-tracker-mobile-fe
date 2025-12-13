@@ -4,8 +4,11 @@ import UserForm from "app/components/buttons/user-form/user-form"
 const Login = () => {
 
   return (
-    <View className='w-full h-full bg-primary pt-24  '>
-     <UserForm login/>
+    <View className='flex-1 justify-center items-center bg-primary '>
+      <View className="w-full translate-y-6">
+
+        <UserForm login/>
+      </View>
     </View>
   );
 }
