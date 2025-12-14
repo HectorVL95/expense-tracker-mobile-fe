@@ -1,12 +1,16 @@
-import { View } from 'react-native'
+import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native'
 import UserForm from "app/components/buttons/user-form/user-form";
 
 const SignUp = () => {
   
   return (
-    <View className='flex-1 pt-24 bg-primary'>
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      className='items-center justify-center bg-primary '
+ 
+    >
       <UserForm signup />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

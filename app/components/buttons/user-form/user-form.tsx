@@ -1,14 +1,12 @@
 import { View, Text, TextInput, Pressable } from 'react-native'
 import LongButton from 'app/components/buttons/long-button';
 import { useNavigation } from '@react-navigation/native';
-import SignUp from 'app/screens/signup';
 import { useState } from 'react';
 
 type userFormTypes = {
   login?: boolean,
   signup?: boolean
 }
-
 
 const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
   const [input_values, set_input_values] = useState({
@@ -27,7 +25,7 @@ const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
   console.log(input_values)
 
   return (
-     <View className='bg-secondary justify-center gap-8 items-center max-w-[320px] rounded-lg p-8'>
+     <View className='bg-secondary justify-center gap-8 items-center w-full max-w-[320px] rounded-lg p-8'>
         <View className='w-full gap-2'>
           <Text className='text-white'>Email Address</Text>
           <TextInput
@@ -39,9 +37,11 @@ const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
         <View className='w-full gap-2'>
           <Text className='text-white'>Password</Text>
           <TextInput 
+            secureTextEntry
             value={input_values.password}
             onChangeText={(text) => set_input_values(prev => ({...prev, password: text}))}
-            className='w-full h-12 bg-tertiary rounded-lg'
+            className='w-full h-12 bg-tertiary rounded-lg text-white'
+            autoCapitalize='none'
           />
         </View>
         {
@@ -49,9 +49,11 @@ const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
         <View className='w-full gap-2'>
           <Text className='text-white'>Confirm Password</Text>
           <TextInput
+            secureTextEntry
             value={input_values.confirm_password}
             onChangeText={(text) => set_input_values(prev => ({...prev, confirm_password: text}))}
-            className='w-full h-12 bg-tertiary rounded-lg'
+            className='w-full h-12 bg-tertiary rounded-lg text-white'
+            autoCapitalize='none'
           />
         </View>
         }

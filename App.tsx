@@ -9,7 +9,6 @@ const Stack = createNativeStackNavigator()
 
 export default function App() {
   return (
-    <View className='flex-1 bg-primary'>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{
           headerStyle: {
@@ -21,6 +20,5 @@ export default function App() {
           <Stack.Screen name='Sign Up' component={SignUp} />
         </Stack.Navigator>
       </NavigationContainer>
-    </View>
   );
 }
