@@ -2,30 +2,91 @@ import { View, Text, TextInput, Pressable } from 'react-native'
 import LongButton from 'app/components/buttons/long-button';
 import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query'
+import * as SecureStore from 'expo-secure-store'
 
 type userFormTypes = {
   login?: boolean,
   signup?: boolean
 }
 
-const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
+const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
   const [input_values, set_input_values] = useState({
+    first_name: '',
+    last_name: '',
     email: '',
     password: '',
     confirm_password: ''
   })
+  
+  const navigate = useNavigation()
 
-    const navigate = useNavigation()
-
-    const go_to_sign_up = ({  }) => {
-    console.log('Sign up screen')
+  const go_to_sign_up = () => {
     navigate.navigate('Sign Up')
   }
 
-  console.log(input_values)
+  const handle_form = async () => {
+    const body = login ? {
+      email: input_values.email,
+      password: input_values.password
+    } : input_values
+
+    const res = await fetch(`${process.env.BACKEND_URL}/api/user/${login ? 'login_user' : 'create_user' }`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    })
+
+    const response_data = await res.json()
+    if (!res) throw new Error('Error in the handle button press)')
+    return response_data
+  }
+
+  const form_mutation = useMutation({
+    mutationFn: handle_form,
+    onSuccess:  (data) => {
+      SecureStore.setItem('auth_token', data.token)
+      console.log('user logged')
+      set_input_values({
+        first_name: '',
+        last_name: '',
+        email: '',
+        password: '',
+        confirm_password: ''
+      })
+    }
+  })
+
+  const handle_press_btn = () => {
+    form_mutation.mutate()
+  }
+
 
   return (
      <View className='bg-secondary justify-center gap-8 items-center w-full max-w-[320px] rounded-lg p-8'>
+        {
+          signup &&
+          <>
+            <View className='w-full gap-2'>
+              <Text className='text-white'>Nombre</Text>
+              <TextInput
+                value={input_values.first_name}
+                onChangeText={(text) => set_input_values(prev => ({...prev, first_name: text}))}
+                className='w-full h-12 bg-tertiary rounded-lg text-white'
+              />
+            </View>
+            <View className='w-full gap-2'>
+              <Text className='text-white'>Apellido</Text>
+              <TextInput
+                value={input_values.last_name}
+                onChangeText={(text) => set_input_values(prev => ({...prev, last_name: text}))}
+                className='w-full h-12 bg-tertiary rounded-lg text-white'
+              />
+            </View>
+          </>
+        }
         <View className='w-full gap-2'>
           <Text className='text-white'>Email Address</Text>
           <TextInput
@@ -57,7 +118,7 @@ const UserForm: React.FC<userFormTypes> = ({login, signup}) => {
           />
         </View>
         }
-        <LongButton text={(login && 'Log In') || (signup && 'Sign Up') }/>
+        <LongButton on_press={handle_press_btn} text={(login && 'Log In') || (signup && 'Sign Up') }/>
         {
           login &&
           <Text className='text-white' onPress={go_to_sign_up}>

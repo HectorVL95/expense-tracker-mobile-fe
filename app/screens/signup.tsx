@@ -1,4 +1,4 @@
-import { KeyboardAvoidingView, Platform, TouchableWithoutFeedback } from 'react-native'
+import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
 import UserForm from "app/components/buttons/user-form/user-form";
 
 const SignUp = () => {
@@ -6,10 +6,14 @@ const SignUp = () => {
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      className='items-center justify-center bg-primary '
- 
+      className='flex-1 bg-primary '
     >
-      <UserForm signup />
+      <ScrollView 
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={{alignItems: 'center', flex: 1, justifyContent: 'center'}}
+      >
+        <UserForm signup />
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
