@@ -19,10 +19,10 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
     confirm_password: ''
   })
   
-  const navigate = useNavigation()
+  const navigation = useNavigation()
 
   const go_to_sign_up = () => {
-    navigate.navigate('Sign Up')
+    navigation.navigate('Sign Up')
   }
 
   const handle_form = async () => {
@@ -31,7 +31,7 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
       password: input_values.password
     } : input_values
 
-    const res = await fetch(`${process.env.BACKEND_URL}/api/user/${login ? 'login_user' : 'create_user' }`, {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/user/${login ? 'login_user' : 'create_user' }`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -47,8 +47,8 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
   const form_mutation = useMutation({
     mutationFn: handle_form,
     onSuccess:  (data) => {
-      SecureStore.setItem('auth_token', data.token)
-      console.log('user logged')
+     const token = SecureStore.setItem('auth_token', data.token)
+      console.log('token saved')
       set_input_values({
         first_name: '',
         last_name: '',
@@ -56,13 +56,17 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
         password: '',
         confirm_password: ''
       })
+      navigation.navigate('Expenses')
+      console.log(token)
+    },
+    onError: (error: any) => {
+      console.log('Mutation error', error.message)
     }
   })
 
   const handle_press_btn = () => {
     form_mutation.mutate()
   }
-
 
   return (
      <View className='bg-secondary justify-center gap-8 items-center w-full max-w-[320px] rounded-lg p-8'>
