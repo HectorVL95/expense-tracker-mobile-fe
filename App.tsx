@@ -1,29 +1,26 @@
-import { View } from 'react-native'
+import { StatusBar } from 'expo-status-bar'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import './global.css';
-import Login from 'app/screens/login';
-import SignUp from 'app/screens/signup';
-import Expenses from 'app/screens/expenses-screens/expenses';
+
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { useAuth } from 'app/hooks/useAuth';
+import AppNavigator from 'app/screens/app-navigator/app-navigator';
+import AuthNavigator from 'app/screens/auth-navigator/auth-navigator';
 
 const Stack = createNativeStackNavigator()
 const queryClient = new QueryClient
 
 export default function App() {
+  const { is_authenticated } = useAuth()
+
   return (
     <QueryClientProvider client={queryClient}>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{
-          headerStyle: {
-            backgroundColor: '#07277cff'
-          },
-          headerTintColor: '#fff'
-        }}>
-          <Stack.Screen name='Login' component={Login} />
-          <Stack.Screen name='Sign Up' component={SignUp} />
-          <Stack.Screen name='Expenses' component={Expenses} />
-        </Stack.Navigator>
+        <StatusBar style='light'/>
+          {
+            is_authenticated ? <AppNavigator/> : <AuthNavigator/>
+          }
       </NavigationContainer>
     </QueryClientProvider>
   );

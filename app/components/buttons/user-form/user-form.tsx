@@ -4,6 +4,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query'
 import * as SecureStore from 'expo-secure-store'
+import { useAuth } from 'app/hooks/useAuth';
 
 type userFormTypes = {
   login?: boolean,
@@ -18,6 +19,7 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
     password: '',
     confirm_password: ''
   })
+  const { log_user_in } =  useAuth()
   
   const navigation = useNavigation()
 
@@ -56,8 +58,8 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
         password: '',
         confirm_password: ''
       })
-      navigation.navigate('Expenses')
       console.log(token)
+      log_user_in()
     },
     onError: (error: any) => {
       console.log('Mutation error', error.message)
