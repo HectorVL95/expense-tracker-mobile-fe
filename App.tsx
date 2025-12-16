@@ -13,6 +13,7 @@ const queryClient = new QueryClient
 
 export default function App() {
   const { is_authenticated } = useAuth()
+  console.log(is_authenticated)
 
   return (
     <QueryClientProvider client={queryClient}>

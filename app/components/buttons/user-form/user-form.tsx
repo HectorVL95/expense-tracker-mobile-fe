@@ -42,14 +42,17 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
     })
 
     const response_data = await res.json()
-    if (!res) throw new Error('Error in the handle button press)')
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.message ||'Error in the handle button press')
+    } 
     return response_data
   }
 
   const form_mutation = useMutation({
     mutationFn: handle_form,
-    onSuccess:  (data) => {
-     const token = SecureStore.setItem('auth_token', data.token)
+    onSuccess: async (data) => {
+     const token = await SecureStore.setItemAsync('auth_token', data.token)
       console.log('token saved')
       set_input_values({
         first_name: '',
