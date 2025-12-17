@@ -49,6 +49,8 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
     return response_data
   }
 
+  console.log(process.env.EXPO_PUBLIC_BACKEND_URL)
+
   const form_mutation = useMutation({
     mutationFn: handle_form,
     onSuccess: async (data) => {
