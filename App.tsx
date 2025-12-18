@@ -2,7 +2,6 @@ import { StatusBar } from 'expo-status-bar'
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import './global.css';
-
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { useAuth } from 'app/hooks/useAuth';
 import AppNavigator from 'app/screens/app-navigator/app-navigator';
@@ -13,7 +12,6 @@ const queryClient = new QueryClient
 
 export default function App() {
   const { is_authenticated } = useAuth()
-  console.log(is_authenticated)
 
   return (
     <QueryClientProvider client={queryClient}>

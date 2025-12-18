@@ -1,7 +1,7 @@
 import {View, Pressable, Text} from 'react-native'
 
 type LongButtonType = {
-  text: text,
+  text: String,
   on_press: () => void
 }
 

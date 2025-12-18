@@ -43,18 +43,15 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
 
     const response_data = await res.json()
     if (!res.ok) {
-      const error = await res.json()
-      throw new Error(error.message ||'Error in the handle button press')
+      throw new Error(response_data.message || 'Error in the handle button press')
     } 
     return response_data
   }
 
-  console.log(process.env.EXPO_PUBLIC_BACKEND_URL)
-
   const form_mutation = useMutation({
     mutationFn: handle_form,
     onSuccess: async (data) => {
-     const token = await SecureStore.setItemAsync('auth_token', data.token)
+      await SecureStore.setItemAsync('auth_token', data.token)
       console.log('token saved')
       set_input_values({
         first_name: '',
@@ -63,7 +60,8 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
         password: '',
         confirm_password: ''
       })
-      console.log(token)
+      console.log('token saved')
+        console.log(process.env.EXPO_PUBLIC_BACKEND_URL)
       log_user_in()
     },
     onError: (error: any) => {
