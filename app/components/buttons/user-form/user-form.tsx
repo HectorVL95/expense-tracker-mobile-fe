@@ -61,7 +61,6 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
         confirm_password: ''
       })
       console.log('token saved')
-        console.log(process.env.EXPO_PUBLIC_BACKEND_URL)
       log_user_in()
     },
     onError: (error: any) => {

@@ -10,7 +10,6 @@ const AppStack = createBottomTabNavigator()
 
 const AppNavigator = () => {
   const { open_modal, set_open_modal } = useModal()
-  console.log(open_modal)
 
   return (
     <>

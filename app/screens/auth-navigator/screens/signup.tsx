@@ -1,8 +1,7 @@
+import UserForm from 'app/components/buttons/user-form/user-form';
 import { KeyboardAvoidingView, Platform, ScrollView } from 'react-native'
-import UserForm from "app/components/buttons/user-form/user-form";
 
-const SignUp = () => {
-  
+const SignUp = () => {  
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
