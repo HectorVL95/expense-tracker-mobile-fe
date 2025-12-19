@@ -51,8 +51,7 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
   const form_mutation = useMutation({
     mutationFn: handle_form,
     onSuccess: async (data) => {
-      await SecureStore.setItemAsync('auth_token', data.token)
-      console.log('token saved')
+      await SecureStore.setItemAsync('token', data.token)
       set_input_values({
         first_name: '',
         last_name: '',
@@ -60,7 +59,6 @@ const UserForm: React.FC<userFormTypes> = ({ login, signup} ) => {
         password: '',
         confirm_password: ''
       })
-      console.log('token saved')
       log_user_in()
     },
     onError: (error: any) => {

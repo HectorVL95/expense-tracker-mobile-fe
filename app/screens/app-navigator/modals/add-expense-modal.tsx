@@ -2,7 +2,7 @@ import { Modal, View, Text, TextInput } from 'react-native';
 import useModal from 'app/hooks/useModal';
 import ShortButton from 'app/components/short-button';
 import DateInput from '../components/date-input';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store'
 import { useMutation } from '@tanstack/react-query';
 
@@ -11,30 +11,30 @@ const AddExpenseModal = () => {
   const [expense_input, set_expense_input] = useState({
     amount: '',
     date: '',
-    name: ''
+    name: '',
   })
 
   const create_expense = async () => {
     const token = await SecureStore.getItemAsync('token')
     if (!token) return;
-    const res = await  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}`, {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/create_expense`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': token.toString()
+        Authorization: `Bearer ${token}`
       },
       body: JSON.stringify(expense_input)
     })
 
-    const response_data = res.json()
     if (!res.ok) throw new Error('Error seing the response')
-    return response_data
+    return await res.json()
   }
 
   const create_expense_mutation = useMutation({
     mutationFn: create_expense,
-    onSuccess:(data) => {
-      console.log('Expense created', data)
+    onSuccess:() => {
       reset_open_modal()
+      console.log('created expense')
     },
     onError: (error) => {
       console.log(error.message)
@@ -44,7 +44,6 @@ const AddExpenseModal = () => {
   const handle_add_button = () => {
     create_expense_mutation.mutate()
   }
-
 
   return (
     <Modal
