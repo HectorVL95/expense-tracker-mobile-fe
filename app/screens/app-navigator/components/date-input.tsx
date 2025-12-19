@@ -1,8 +1,17 @@
-import { useState } from 'react';
+import { useState, Dispatch } from 'react';
 import { Pressable, View, Text, Platform } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker'
 
-const DateInput = () => {
+type DateInputType = {
+  date_input: String
+  set_date_input: React.Dispatch<React.SetStateAction<{
+    amount: string,
+    date: string,
+    name: string
+  }>>
+}
+
+const DateInput: React.FC<DateInputType> = ({date_input, set_date_input}) => {
   const [show, set_show] = useState(false)
   const [date, set_date] = useState<Date | null>(null)
 
@@ -27,7 +36,14 @@ const DateInput = () => {
         display={Platform.OS === 'ios' ? 'spinner' : 'default'}
         onChange={(event, selected_date) => {
           set_show(false)
-          if (selected_date) set_date(selected_date)
+          if (selected_date) {
+            const formatted = format_date(selected_date)
+            set_date(selected_date)
+            set_date_input(prev => ({
+              ...prev,
+              date: formatted
+            }))
+          }
         }}
       />}
     </View>

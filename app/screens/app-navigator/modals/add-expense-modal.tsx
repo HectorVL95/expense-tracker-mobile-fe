@@ -3,12 +3,48 @@ import useModal from 'app/hooks/useModal';
 import ShortButton from 'app/components/short-button';
 import DateInput from '../components/date-input';
 import { useState } from 'react';
+import * as SecureStore from 'expo-secure-store'
+import { useMutation } from '@tanstack/react-query';
 
 const AddExpenseModal = () => {
   const { open_modal, reset_open_modal } = useModal()
   const [expense_input, set_expense_input] = useState({
-
+    amount: '',
+    date: '',
+    name: ''
   })
+
+  const create_expense = async () => {
+    const token = await SecureStore.getItemAsync('token')
+    if (!token) return;
+    const res = await  fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': token.toString()
+      },
+      body: JSON.stringify(expense_input)
+    })
+
+    const response_data = res.json()
+    if (!res.ok) throw new Error('Error seing the response')
+    return response_data
+  }
+
+  const create_expense_mutation = useMutation({
+    mutationFn: create_expense,
+    onSuccess:(data) => {
+      console.log('Expense created', data)
+      reset_open_modal()
+    },
+    onError: (error) => {
+      console.log(error.message)
+    }
+  })
+
+  const handle_add_button = () => {
+    create_expense_mutation.mutate()
+  }
+
 
   return (
     <Modal
@@ -31,9 +67,11 @@ const AddExpenseModal = () => {
                 <TextInput
                   className='font-bold bg-whiteish rounded-lg pl-2'
                   keyboardType='numeric'
+                  value={expense_input.amount}
+                  onChangeText={(text) => set_expense_input(prev => ({...prev, amount: text}))}
                 />
               </View>
-             <DateInput/>
+             <DateInput date_input={expense_input.date} set_date_input={set_expense_input}/>
             </View>
             <View className='w-full max-w-[360px] items-center'>
               <Text className='text-white text-left font-bold'>Name</Text>
@@ -42,12 +80,14 @@ const AddExpenseModal = () => {
                 numberOfLines={4}
                 className='w-full font-bold bg-whiteish rounded-lg h-[120px] pl-2'
                 textAlignVertical='top'
+                value={expense_input.name}
+                onChangeText={(text) => set_expense_input(prev => ({...prev, name: text}))}
               />
             </View>
           </View>
           <View className='justify-center items-center flex-row gap-8'>
             <ShortButton on_press={reset_open_modal} text={'Cancel'}/>
-            <ShortButton on_press={()=>{}} text={'Add'} filled/>
+            <ShortButton on_press={handle_add_button} text={'Add'} filled/>
           </View>
         </View>
       </View>
