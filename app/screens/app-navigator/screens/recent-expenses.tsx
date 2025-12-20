@@ -8,7 +8,7 @@ const RecentExpenses = () => {
   const fetch_expense = async () => {
     const token = await SecureStore.getItemAsync('token')
     if (!token) return;
-    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/get_expenses`, {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/get_expenses?last_7_days=1`, {
       method: 'GET',
       headers:{ 
         'Content-Type':'application/json',
@@ -16,7 +16,7 @@ const RecentExpenses = () => {
       }
     })
 
-    if (!res.ok) throw new Error('ERROR ')
+    if (!res.ok) throw new Error('error in the fetch expense API call')
     return res.json()
   }
 
@@ -44,6 +44,7 @@ const RecentExpenses = () => {
         isSuccess &&
         expenses_data.data.map(expense => 
         <ExpenseInfo
+          key={expense._id}
           name={expense.name}
           date={expense.date}
           price={expense.amount}

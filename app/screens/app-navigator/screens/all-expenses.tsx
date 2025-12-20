@@ -6,9 +6,9 @@ import { useQuery } from "@tanstack/react-query";
 const AllExpenses = () => {
 
   const fetch_expense = async () => {
-    const token = await SecureStore.getTimeAsync('token')
+    const token = await SecureStore.getItemAsync('token')
     if (!token) return;
-    const res = fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/get_expenses`, {
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/get_expenses`, {
       method: 'GET',
       headers: {
         'Content-Type' : 'application/json',
@@ -16,9 +16,8 @@ const AllExpenses = () => {
       }
     })
 
-    if (!res.ok) throw new Error('error in the fetch expense')
-
-    return (await res).json()
+    if (!res.ok) throw new Error('error in the fetch expense API call')
+    return res.json()
   }
 
   const { isSuccess, data: expense_data } = useQuery({
@@ -45,9 +44,10 @@ const AllExpenses = () => {
           isSuccess &&
           expense_data.data.map(expense =>         
           <ExpenseInfo
+            key={expense._id}
             name={expense.name}
             date={expense.date}
-            price={expense.price}
+            price={expense.amount}
           />)
         }
       </View>

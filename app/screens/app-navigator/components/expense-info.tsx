@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 
 type ExpenseInfo = {
   name: String,
-  date: String,
+  date: Date,
   price: String
 }
 
@@ -14,7 +14,7 @@ const ExpenseInfo: React.FC<ExpenseInfo> = ({name, date, price}) => {
           {name}
         </Text>
         <Text className="text-whiteish font-bold">
-          {date}
+          {new Date(date).toLocaleDateString('en-CA')}
         </Text>
       </View>
       <View className="bg-white p-4 justify-center rounded-lg">
