@@ -35,6 +35,11 @@ const AddExpenseModal = () => {
     onSuccess:() => {
       reset_open_modal()
       console.log('created expense')
+      set_expense_input({
+        amount: '',
+        date: '',
+        name: '',
+      })
     },
     onError: (error) => {
       console.log(error.message)
@@ -43,6 +48,15 @@ const AddExpenseModal = () => {
 
   const handle_add_button = () => {
     create_expense_mutation.mutate()
+  }
+
+  const handle_cancel_button = () => {
+    reset_open_modal()
+    set_expense_input({
+      amount: '',
+      date: '',
+      name: '',
+      })
   }
 
   return (
@@ -85,7 +99,7 @@ const AddExpenseModal = () => {
             </View>
           </View>
           <View className='justify-center items-center flex-row gap-8'>
-            <ShortButton on_press={reset_open_modal} text={'Cancel'}/>
+            <ShortButton on_press={handle_cancel_button} text={'Cancel'}/>
             <ShortButton on_press={handle_add_button} text={'Add'} filled/>
           </View>
         </View>
