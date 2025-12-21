@@ -1,14 +1,18 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from 'react-native';
+import useModal from 'app/hooks/useModal';
 
 type ExpenseInfo = {
+  id: string
   name: String,
   date: Date,
   price: String
 }
 
-const ExpenseInfo: React.FC<ExpenseInfo> = ({name, date, price}) => {
+const ExpenseInfo: React.FC<ExpenseInfo> = ({ id, name, date, price }) => {
+  const { set_open_modal } = useModal()
+
   return (
-    <View className="flex-row items-center justify-between bg-secondary w-full rounded-xl p-4 max-h-[120px]">
+    <Pressable onPress={() => set_open_modal(true, 'edit', id)} className="flex-row items-center justify-between bg-secondary w-full rounded-xl p-4 max-h-[120px]">
       <View className="gap-4">
         <Text className="text-white font-bold">
           {name}
@@ -22,7 +26,7 @@ const ExpenseInfo: React.FC<ExpenseInfo> = ({name, date, price}) => {
           {price}
         </Text>
       </View>
-    </View>
+    </Pressable>
   );
 }
 

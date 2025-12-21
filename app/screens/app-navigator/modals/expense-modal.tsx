@@ -4,15 +4,59 @@ import ShortButton from 'app/components/short-button';
 import DateInput from '../components/date-input';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store'
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getItemAsync } from 'expo-secure-store';
+import { useQuery } from '@tanstack/react-query';
 
-const AddExpenseModal = () => {
-  const { open_modal, reset_open_modal } = useModal()
+const ExpenseModal = () => {
+  const queryClient = useQueryClient()
+  const { open_modal, reset_open_modal, modal_type, modal_id } = useModal()
   const [expense_input, set_expense_input] = useState({
     amount: '',
     date: '',
     name: '',
   })
+
+
+  const get_single_expense = async () => {
+    const token = await getItemAsync('token')
+    if (!token) return;
+
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/get_single_expense/${modal_id}`, {
+      headers:{
+        Authorization: `Bearer ${token}`,
+        'Content-Type' : 'application/json'
+      }
+    })
+
+    if (!res.ok) throw new Error('Error in API call to get a single expense')
+
+    return await res.json()
+  }
+  
+    const { isLoading, data: expense_data } = useQuery({
+      queryKey: ['single_expense', modal_id],
+      queryFn: get_single_expense,
+      enabled: !!modal_id,
+    }) 
+
+    useEffect(() => {
+      if(!expense_data) return;
+
+      set_expense_input({
+        amount: String(expense_data.amount),
+        date: expense_data.date,
+        name: expense_data.name,
+      })
+    }, [expense_data])
+
+  const is_recent_expense = (date: string) => {
+    const expense_date = new Date(date)
+    const seven_days_ago = new Date()
+    seven_days_ago.setDate(seven_days_ago.getDate() - 7)
+
+    return expense_date >= seven_days_ago
+  }
 
   const create_expense = async () => {
     const token = await SecureStore.getItemAsync('token')
@@ -33,6 +77,11 @@ const AddExpenseModal = () => {
   const create_expense_mutation = useMutation({
     mutationFn: create_expense,
     onSuccess:() => {
+      queryClient.invalidateQueries({queryKey: ['all_expenses']})
+
+      if (is_recent_expense(expense_input.date)) {
+        queryClient.invalidateQueries({queryKey: ['recent_expenses']})
+      }
       reset_open_modal()
       console.log('created expense')
       set_expense_input({
@@ -48,6 +97,10 @@ const AddExpenseModal = () => {
 
   const handle_add_button = () => {
     create_expense_mutation.mutate()
+  }
+
+  const handle_update_button = () => {
+
   }
 
   const handle_cancel_button = () => {
@@ -68,8 +121,9 @@ const AddExpenseModal = () => {
       }}
       transparent
     >
+
       <View  className='bg-secondary h-12 items-center justify-center rounded-t-12 overflow-hidden'>
-        <Text className='text-white text-center font-bold'>Add expense</Text>
+        <Text className='text-white text-center font-bold'>{modal_type === 'add' ? 'Add expense' : 'Edit expense'}</Text>
       </View>
       <View className='flex-1 items-center bg-primary p-8'>
         <View className='flex-col gap-2'>
@@ -84,7 +138,7 @@ const AddExpenseModal = () => {
                   onChangeText={(text) => set_expense_input(prev => ({...prev, amount: text}))}
                 />
               </View>
-             <DateInput date_input={expense_input.date} set_date_input={set_expense_input}/>
+            <DateInput date_input={expense_input.date} set_date_input={set_expense_input}/>
             </View>
             <View className='w-full max-w-[360px] items-center'>
               <Text className='text-white text-left font-bold'>Name</Text>
@@ -100,7 +154,10 @@ const AddExpenseModal = () => {
           </View>
           <View className='justify-center items-center flex-row gap-8'>
             <ShortButton on_press={handle_cancel_button} text={'Cancel'}/>
-            <ShortButton on_press={handle_add_button} text={'Add'} filled/>
+            {modal_type === 'add' ? 
+            <ShortButton on_press={handle_add_button} text={'Add'} filled/>: 
+            <ShortButton on_press={handle_update_button} text={'Update'} filled/>
+            }
           </View>
         </View>
       </View>
@@ -108,4 +165,4 @@ const AddExpenseModal = () => {
   );
 }
 
-export default AddExpenseModal;
+export default ExpenseModal;

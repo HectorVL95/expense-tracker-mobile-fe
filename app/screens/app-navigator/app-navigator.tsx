@@ -4,7 +4,7 @@ import AllExpenses from './screens/all-expenses';
 import RecentExpenses from './screens/recent-expenses';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import useModal from 'app/hooks/useModal';
-import AddExpenseModal from './modals/add-expense-modal';
+import ExpenseModal from './modals/expense-modal';
 
 const AppStack = createBottomTabNavigator()
 
@@ -13,7 +13,7 @@ const AppNavigator = () => {
 
   return (
     <>
-      <AddExpenseModal/>
+      <ExpenseModal/>
       <AppStack.Navigator
         screenOptions={{
           tabBarStyle: {
@@ -30,7 +30,7 @@ const AppNavigator = () => {
           component={RecentExpenses}
           options={{
             tabBarIcon: ({focused, color, size}) => <Ionicons name={focused ? 'time' : 'time-outline'} size={size} color={color}/>,
-            headerRight: () => <Ionicons onPress={() => set_open_modal(true)} name={'add-outline'} size={40} color={'#fff'}/>
+            headerRight: () => <Ionicons onPress={() => set_open_modal(true, 'add')} name={'add-outline'} size={40} color={'#fff'}/>
           }}
         />
         <AppStack.Screen 
@@ -38,7 +38,7 @@ const AppNavigator = () => {
           component={AllExpenses}
           options={{
             tabBarIcon: ({focused, color, size}) => <Ionicons name={focused ? 'list': 'list-outline'} size={size} color={color} />,
-            headerRight: () => <Ionicons onPress={() => set_open_modal(true)} name={'add-outline'} size={40} color={'#fff'}/>
+            headerRight: () => <Ionicons onPress={() => set_open_modal(true, 'add')} name={'add-outline'} size={40} color={'#fff'}/>
             
           }}
         />

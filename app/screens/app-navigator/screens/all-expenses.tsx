@@ -21,7 +21,7 @@ const AllExpenses = () => {
   }
 
   const { isSuccess, data: expense_data } = useQuery({
-    queryKey: ['expenses'],
+    queryKey: ['all_expenses'],
     queryFn: fetch_expense,
   });
 
@@ -45,6 +45,7 @@ const AllExpenses = () => {
           expense_data.data.map(expense =>         
           <ExpenseInfo
             key={expense._id}
+            id={expense._id}
             name={expense.name}
             date={expense.date}
             price={expense.amount}
