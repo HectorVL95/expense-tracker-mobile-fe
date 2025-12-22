@@ -1,15 +1,14 @@
-import { useState } from 'react';
+import useModal from 'app/hooks/useModal';
 import { Ionicons } from '@expo/vector-icons'
 import AllExpenses from './screens/all-expenses';
+import ExpenseModal from './modals/expense-modal';
 import RecentExpenses from './screens/recent-expenses';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
-import useModal from 'app/hooks/useModal';
-import ExpenseModal from './modals/expense-modal';
 
 const AppStack = createBottomTabNavigator()
 
 const AppNavigator = () => {
-  const { open_modal, set_open_modal } = useModal()
+  const {  set_open_modal } = useModal()
 
   return (
     <>

@@ -36,7 +36,7 @@ const RecentExpenses = () => {
           Last 7 Days
         </Text>
         <Text className="text-purple text-xl font-bold">
-          $67.50
+          ${expenses_data?.amounts_sum}
         </Text>
       </View>
           <View className="gap-4">

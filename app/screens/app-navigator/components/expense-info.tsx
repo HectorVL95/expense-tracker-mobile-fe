@@ -23,7 +23,7 @@ const ExpenseInfo: React.FC<ExpenseInfo> = ({ id, name, date, price }) => {
       </View>
       <View className="bg-white p-4 justify-center rounded-lg">
         <Text className="text-purple font-bold text-lg">
-          {price}
+          ${price}
         </Text>
       </View>
     </Pressable>

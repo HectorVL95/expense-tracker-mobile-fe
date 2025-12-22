@@ -36,7 +36,7 @@ const AllExpenses = () => {
           All expenses
         </Text>
         <Text className="text-purple text-xl font-bold">
-          $67.50
+          ${expense_data?.amounts_sum}
         </Text>
       </View>
       <View className="gap-4">
