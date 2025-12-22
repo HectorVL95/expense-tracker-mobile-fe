@@ -235,11 +235,11 @@ const ExpenseModal = () => {
           <View
             style={{height: 16, backgroundColor: '#3a3a3a', width: '100%'}}
           />
-          <View className='justify-center items-center'>
+         {modal_type !== 'add' && <View className='justify-center items-center'>
             <Pressable>
               <Ionicons size={40} color={'#ec0505ff'} className='bg-secondary p-4 rounded-lg' name='trash-outline' />
             </Pressable>
-          </View>
+          </View>}
         </View>
       </View>
     </Modal>
