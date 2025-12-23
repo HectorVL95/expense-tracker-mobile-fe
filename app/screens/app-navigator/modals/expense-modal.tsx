@@ -86,9 +86,8 @@ const ExpenseModal = () => {
     onSuccess:() => {
       queryClient.invalidateQueries({queryKey: ['all_expenses']})
 
-      if (is_recent_expense(expense_input.date)) {
-        queryClient.invalidateQueries({queryKey: ['recent_expenses']})
-      }
+      queryClient.invalidateQueries({queryKey: ['recent_expenses']})
+      
       reset_open_modal()
       console.log('created expense')
       set_expense_input({
@@ -123,10 +122,7 @@ const ExpenseModal = () => {
     mutationFn: edit_expense,
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ['all_expenses']})
-
-      if (is_recent_expense(expense_input.date)) {
-        queryClient.invalidateQueries({queryKey: ['recent_expenses']})
-      }
+      queryClient.invalidateQueries({queryKey: ['recent_expenses']})
       reset_open_modal()
       set_expense_input({
         name: '',
@@ -140,12 +136,48 @@ const ExpenseModal = () => {
     }
   })
 
+  const delete_expense = async () => {
+    const token = await SecureStore.getItemAsync('token')
+    const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/delete_expense/${modal_id}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`
+      }
+    })
+    if (!res.ok) throw new Error('Error in your delete expednse API call')
+    return await res.json()
+  }
+
+  const delete_expense_mutation = useMutation({
+    mutationFn: delete_expense,
+    onSuccess: () => {
+      queryClient.invalidateQueries({queryKey: ['all_expenses']})
+      queryClient.invalidateQueries({queryKey:['recent_expenses']})
+      set_expense_input({
+        name: '',
+        date: '',
+        amount: ''
+      })
+      set_date(null)
+      reset_open_modal()
+      console.log('Expense deleted')
+    },
+    onError: (error) => {
+      console.error(error)
+    }
+  })
+
   const handle_add_button = () => {
     create_expense_mutation.mutate()
   }
 
   const handle_update_button = () => {
     edit_expense_mutation.mutate()
+  }
+
+  const handle_delete_button = () => {
+    delete_expense_mutation.mutate()
   }
 
   const handle_cancel_button = () => {
@@ -236,7 +268,7 @@ const ExpenseModal = () => {
             style={{height: 16, backgroundColor: '#3a3a3a', width: '100%'}}
           />
          {modal_type !== 'add' && <View className='justify-center items-center'>
-            <Pressable>
+            <Pressable onPress={handle_delete_button}>
               <Ionicons size={40} color={'#ec0505ff'} className='bg-secondary p-4 rounded-lg' name='trash-outline' />
             </Pressable>
           </View>}

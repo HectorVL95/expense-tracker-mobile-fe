@@ -53,8 +53,6 @@ const RecentExpenses = () => {
         )
       }
       </View>
-  
- 
     </ScrollView>
   );
 }
