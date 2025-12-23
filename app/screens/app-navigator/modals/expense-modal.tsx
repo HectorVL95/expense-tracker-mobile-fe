@@ -50,21 +50,19 @@ const ExpenseModal = () => {
       name: expense_data.data.name,
     })
     set_date(new Date(expense_data.data.date))
-    console.log(expense_data.data)
-    console.log(expense_input)
   }, [expense_data])
 
   const format_date = (date: Date) => {
     return `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${date.getFullYear()}`
   }
 
-  const is_recent_expense = (date: string) => {
-    const expense_date = new Date(date)
-    const seven_days_ago = new Date()
-    seven_days_ago.setDate(seven_days_ago.getDate() - 7)
+  // const is_recent_expense = (date: string) => {
+  //   const expense_date = new Date(date)
+  //   const seven_days_ago = new Date()
+  //   seven_days_ago.setDate(seven_days_ago.getDate() - 7)
 
-    return expense_date >= seven_days_ago
-  }
+  //   return expense_date >= seven_days_ago
+  // }
 
   const create_expense = async () => {
     const token = await SecureStore.getItemAsync('token')
@@ -85,7 +83,6 @@ const ExpenseModal = () => {
     mutationFn: create_expense,
     onSuccess:() => {
       queryClient.invalidateQueries({queryKey: ['all_expenses']})
-
       queryClient.invalidateQueries({queryKey: ['recent_expenses']})
       
       reset_open_modal()
