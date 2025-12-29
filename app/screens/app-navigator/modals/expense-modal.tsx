@@ -6,8 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import ShortButton from 'app/components/short-button';
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Modal, View, Text, TextInput, Pressable, Platform, StyleSheet } from 'react-native';
+import { Modal, View, Text, TextInput, Pressable, Platform, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker'
 
 
 const ExpenseModal = () => {
@@ -20,7 +21,7 @@ const ExpenseModal = () => {
   })
   const [date, set_date] = useState<Date | null>(null)
   const [show, set_show] = useState(false)
-
+  const [image, set_image] = useState<File | null | string>(null)
 
   const get_single_expense = async () => {
     const token = await getItemAsync('token')
@@ -50,29 +51,48 @@ const ExpenseModal = () => {
       name: expense_data.data.name,
     })
     set_date(new Date(expense_data.data.date))
+    set_image(expense_data.data.photo)
   }, [expense_data])
 
   const format_date = (date: Date) => {
     return `${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}-${date.getFullYear()}`
   }
 
-  // const is_recent_expense = (date: string) => {
-  //   const expense_date = new Date(date)
-  //   const seven_days_ago = new Date()
-  //   seven_days_ago.setDate(seven_days_ago.getDate() - 7)
+  const handle_pick_image = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 0.8
+    })
 
-  //   return expense_date >= seven_days_ago
-  // }
+     if (!result.canceled) {
+      set_image(result.assets[0].uri)
+     }
+  }
+
+  console.log(expense_input.amount)
+  console.log(typeof expense_input.amount)
 
   const create_expense = async () => {
     const token = await SecureStore.getItemAsync('token')
+    const form_data = new FormData()
+    form_data.append('name', expense_input.name)
+    form_data.append('amount', expense_input.amount)
+    form_data.append('date', expense_input.date)
+
+    if (image) {
+      form_data.append('photo', {
+        uri: image,
+        name: 'expense,jpg',
+        type: 'image/jpeg'
+      } as any)
+    }
     const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/create_expense`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify(expense_input)
+      body: form_data
     })
 
     if (!res.ok) throw new Error('Error seing the response')
@@ -93,6 +113,7 @@ const ExpenseModal = () => {
         name: '',
       })
       set_date(null)
+      set_image(null)
     },
     onError: (error) => {
       console.log(error.message)
@@ -101,13 +122,26 @@ const ExpenseModal = () => {
 
   const edit_expense = async () => {
     const token = await SecureStore.getItemAsync('token')
+    const form_data = new FormData()
+
+    form_data.append('name', expense_input.name)
+    form_data.append('amount', expense_input.amount)
+    form_data.append('date', expense_input.date)
+
+    if (image) {
+      form_data.append('photo', {
+        uri: image,
+        name: 'expense.jpg',
+        type: 'image/jpeg'
+      } as any) 
+    }
+
     const res = await fetch(`${process.env.EXPO_PUBLIC_BACKEND_URL}/expense/edit_expense/${modal_id}`, {
       method: 'PATCH',
       headers: {
-        'Content-Type' : 'application/json',
         Authorization : `Bearer ${token}`
       },
-      body: JSON.stringify(expense_input)
+      body: form_data
     })
 
     if (!res.ok) throw new Error('Error in your edit expense API call')
@@ -127,6 +161,7 @@ const ExpenseModal = () => {
         amount: ''
       })
       set_date(null)
+      set_image(null)
     },
     onError: (error) => {
       console.error(error.message)
@@ -184,6 +219,7 @@ const ExpenseModal = () => {
       date: '',
       name: '',
     })
+    set_image(null)
     set_date(null)
   }
 
@@ -200,8 +236,8 @@ const ExpenseModal = () => {
         <Text className='text-white text-center font-bold'>{modal_type === 'add' ? 'Add expense' : 'Edit expense'}</Text>
       </View>
       <View className='flex-1 items-center bg-primary p-8'>
-        <View className='flex-col gap-2'>
-          <View className='flex-col justify-center items-center gap-2 '>
+        <View className='flex-col max-w-[360px] w-full justify-center items-center  gap-2'>
+          <View className='flex-col w-full justify-center items-center gap-2 '>
             <View className='flex-row gap-2'>
               <View className='w-full max-w-[180px]'>
                 <Text className='text-whiteish font-bold'>Amount</Text>
@@ -221,37 +257,46 @@ const ExpenseModal = () => {
                     {date ? format_date(date) : 'Selected date'}
                   </Text>
                 </Pressable>
-                {show && 
-                <DateTimePicker
-                  value={date ?? new Date()}
-                  mode='date'
-                  display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                  onChange={(event, selected_date) => {
-                    set_show(false)
-                    if (selected_date) {
-                      const formatted = format_date(selected_date)
-                      set_date(selected_date)
-                      set_expense_input(prev => ({
-                        ...prev,
-                        date: formatted
-                      }))
-                    }
-                  }}
-                />}
+                {
+                  show && 
+                  <DateTimePicker
+                    value={date ?? new Date()}
+                    mode='date'
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event, selected_date) => {
+                      set_show(false)
+                      if (selected_date) {
+                        const formatted = format_date(selected_date)
+                        set_date(selected_date)
+                        set_expense_input(prev => ({
+                          ...prev,
+                          date: formatted
+                        }))
+                      }
+                    }}
+                  />
+                }
               </View>
             </View>
-            <View className='w-full max-w-[360px] items-center'>
+            <View className='w-full items-center'>
               <Text className='text-white text-left font-bold'>Name</Text>
               <TextInput 
                 multiline
                 numberOfLines={4}
-                className='w-full font-bold bg-whiteish rounded-lg h-[120px] pl-2'
+                className=' font-bold bg-whiteish w-full rounded-lg h-[120px] pl-2'
                 textAlignVertical='top'
                 value={expense_input.name}
                 onChangeText={(text) => set_expense_input(prev => ({...prev, name: text}))}
               />
             </View>
           </View>
+          <Pressable className='justify-center items-center bg-whiteish w-full justify-center items-center rounded-lg' onPress={handle_pick_image}>
+            <Ionicons color={'#fff'}  name='camera-outline' size={40}/>
+          </Pressable>
+          {
+            image && 
+            <Image source={{uri: image}} className='w-full h-[200px]'/>
+          }
           <View className='justify-center items-center flex-row gap-8'>
             <ShortButton on_press={handle_cancel_button} text={'Cancel'}/>
             {
@@ -262,13 +307,15 @@ const ExpenseModal = () => {
             }
           </View>
           <View
-            style={{height: 16, backgroundColor: '#3a3a3a', width: '100%'}}
+            style={{height: 1, backgroundColor: '#3a3a3a', width: '100%'}}
           />
-         {modal_type !== 'add' && <View className='justify-center items-center'>
+         {
+            modal_type !== 'add' && <View className='justify-center items-center'>
             <Pressable onPress={handle_delete_button}>
               <Ionicons size={40} color={'#ec0505ff'} className='bg-secondary p-4 rounded-lg' name='trash-outline' />
             </Pressable>
-          </View>}
+            </View>
+          }
         </View>
       </View>
     </Modal>
